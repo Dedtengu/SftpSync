@@ -1,0 +1,26 @@
+{
+    "sourceFile": "SftpSync.UI/SftpSync.UI.csproj",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1780581668399,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1780582828716,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-﻿@'\r\n+@'\r\n <Project Sdk=\"Microsoft.NET.Sdk\">\r\n   <PropertyGroup>\r\n     <OutputType>WinExe</OutputType>\r\n     <TargetFramework>net10.0-windows</TargetFramework>\r\n"
+                },
+                {
+                    "date": 1780582834952,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,18 @@\n+@'\r\n+<Project Sdk=\"Microsoft.NET.Sdk\">\r\n+  <PropertyGroup>\r\n+    <OutputType>WinExe</OutputType>\r\n+    <TargetFramework>net10.0-windows</TargetFramework>\r\n+    <Nullable>enable</Nullable>\r\n+    <ImplicitUsings>enable</ImplicitUsings>\r\n+    <UseWPF>true</UseWPF>\r\n+  </PropertyGroup>\r\n+  <ItemGroup>\r\n+    <ProjectReference Include=\"..\\SftpSync.Core\\SftpSync.Core.csproj\" />\r\n+    <ProjectReference Include=\"..\\SftpSync.Services\\SftpSync.Services.csproj\" />\r\n+  </ItemGroup>\r\n+  <ItemGroup>\r\n+    <PackageReference Include=\"CommunityToolkit.Mvvm\" Version=\"8.4.0\" />\r\n+  </ItemGroup>\r\n+</Project>\r\n+'@ | Out-File -FilePath \"SftpSync.UI\\SftpSync.UI.csproj\" -Encoding utf8\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1780581668399,
+            "name": "Commit-0",
+            "content": "<Project Sdk=\"Microsoft.NET.Sdk\">\r\n\r\n  <PropertyGroup>\r\n    <OutputType>WinExe</OutputType>\r\n    <TargetFramework>net10.0-windows</TargetFramework>\r\n    <Nullable>enable</Nullable>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    \r\n    <UseWPF>true</UseWPF>\r\n  </PropertyGroup>\r\n\r\n  <ItemGroup>\r\n    <ProjectReference Include=\"..\\SftpSync.Core\\SftpSync.Core.csproj\" />\r\n    <ProjectReference Include=\"..\\SftpSync.Services\\SftpSync.Services.csproj\" />\r\n  </ItemGroup>\r\n\r\n  <ItemGroup>\r\n    <PackageReference Include=\"CommunityToolkit.Mvvm\" Version=\"8.4.0\" />\r\n  </ItemGroup>\r\n\r\n</Project>"
+        }
+    ]
+}

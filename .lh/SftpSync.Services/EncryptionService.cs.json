@@ -1,0 +1,22 @@
+{
+    "sourceFile": "SftpSync.Services/EncryptionService.cs",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1780580286843,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1780580503747,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,13 @@\n using System;\r\n+using System.Runtime.Versioning;\r\n using System.Security.Cryptography;\r\n using System.Text;\r\n \r\n namespace SftpSync.Services\r\n {\r\n+    // On indique au compilateur que cette classe est exclusivement conçue pour Windows\r\n+    [SupportedOSPlatform(\"windows\")]\r\n     public class EncryptionService\r\n     {\r\n         private static readonly byte[] Entropy = Encoding.UTF8.GetBytes(\"SftpSync-Secret-2026-Data\");\r\n \r\n"
+                }
+            ],
+            "date": 1780580286843,
+            "name": "Commit-0",
+            "content": "using System;\r\nusing System.Security.Cryptography;\r\nusing System.Text;\r\n\r\nnamespace SftpSync.Services\r\n{\r\n    public class EncryptionService\r\n    {\r\n        private static readonly byte[] Entropy = Encoding.UTF8.GetBytes(\"SftpSync-Secret-2026-Data\");\r\n\r\n        public string Encrypt(string plainText)\r\n        {\r\n            if (string.IsNullOrEmpty(plainText)) return string.Empty;\r\n\r\n            try\r\n            {\r\n                byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);\r\n                byte[] cipherBytes = ProtectedData.Protect(plainBytes, Entropy, DataProtectionScope.CurrentUser);\r\n                return Convert.ToBase64String(cipherBytes);\r\n            }\r\n            catch\r\n            {\r\n                return string.Empty;\r\n            }\r\n        }\r\n\r\n        public string Decrypt(string cipherText)\r\n        {\r\n            if (string.IsNullOrEmpty(cipherText)) return string.Empty;\r\n\r\n            try\r\n            {\r\n                byte[] cipherBytes = Convert.FromBase64String(cipherText);\r\n                byte[] plainBytes = ProtectedData.Unprotect(cipherBytes, Entropy, DataProtectionScope.CurrentUser);\r\n                return Encoding.UTF8.GetString(plainBytes);\r\n            }\r\n            catch\r\n            {\r\n                return \"Erreur de déchiffrement\";\r\n            }\r\n        }\r\n    }\r\n}"
+        }
+    ]
+}

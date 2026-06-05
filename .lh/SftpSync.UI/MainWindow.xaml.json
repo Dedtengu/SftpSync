@@ -1,0 +1,26 @@
+{
+    "sourceFile": "SftpSync.UI/MainWindow.xaml",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1780581092086,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1780583440839,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-﻿<Window x:Class=\"SftpSync.UI.MainWindow\"\r\n+<Window x:Class=\"SftpSync.UI.MainWindow\"\r\n         xmlns=\"http://schemas.microsoft.com/住宅/2006/xaml/presentation\"\r\n         xmlns:presentation=\"http://schemas.microsoft.com/winfx/2000/xaml/presentation\"\r\n         xmlns:x=\"http://schemas.microsoft.com/winfx/2000/xaml\"\r\n         Title=\"SftpSync - Assistant de Transfert\" Height=\"350\" Width=\"500\"\r\n"
+                },
+                {
+                    "date": 1780583453372,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-﻿<Window x:Class=\"SftpSync.UI.MainWindow\"\r\n+<Window x:Class=\"SftpSync.UI.MainWindow\"\r\n         xmlns=\"http://schemas.microsoft.com/住宅/2006/xaml/presentation\"\r\n         xmlns:presentation=\"http://schemas.microsoft.com/winfx/2000/xaml/presentation\"\r\n         xmlns:x=\"http://schemas.microsoft.com/winfx/2000/xaml\"\r\n         Title=\"SftpSync - Assistant de Transfert\" Height=\"350\" Width=\"500\"\r\n"
+                }
+            ],
+            "date": 1780581092086,
+            "name": "Commit-0",
+            "content": "<Window x:Class=\"SftpSync.UI.MainWindow\"\r\n        xmlns=\"http://schemas.microsoft.com/winfx/2000/xaml/presentation\"\r\n        xmlns:x=\"http://schemas.microsoft.com/winfx/2000/xaml\"\r\n        Title=\"SftpSync - Assistant de Transfert\" Height=\"350\" Width=\"500\"\r\n        Background=\"#F5F5F5\">\r\n    <Grid Margin=\"20\">\r\n        <Grid.RowDefinitions>\r\n            <RowDefinition Height=\"Auto\"/>\r\n            <RowDefinition Height=\"Auto\"/>\r\n            <RowDefinition Height=\"*\"/>\r\n        </Grid.RowDefinitions>\r\n\r\n        <TextBlock Grid.Row=\"0\" Text=\"Contrôle SftpSync\" FontSize=\"20\" FontWeight=\"Bold\" Foreground=\"#333333\" Margin=\"0,0,0,20\"/>\r\n\r\n        <StackPanel Grid.Row=\"1\" Orientation=\"Horizontal\" Margin=\"0,0,0,20\">\r\n            <Button x:Name=\"BtnTest\" Content=\"1. Tester simu Connexion\" Width=\"180\" Height=\"35\" Margin=\"0,0,10,0\" \r\n                    Background=\"#007ACC\" Foreground=\"White\" FontWeight=\"Bold\" Click=\"BtnTest_Click\"/>\r\n            \r\n            <Button x:Name=\"BtnStart\" Content=\"2. Lancer la Surveillance\" Width=\"180\" Height=\"35\" \r\n                    Background=\"#28A745\" Foreground=\"White\" FontWeight=\"Bold\" Click=\"BtnStart_Click\"/>\r\n        </StackPanel>\r\n\r\n        <GroupBox Grid.Row=\"2\" Header=\"Journal d'activité en direct\" Padding=\"10\">\r\n            <TextBox x:Name=\"TxtStatus\" IsReadOnly=\"True\" VerticalScrollBarVisibility=\"Auto\" \r\n                     TextWrapping=\"Wrap\" Background=\"White\" FontFamily=\"Consolas\"/>\r\n        </GroupBox>\r\n    </Grid>\r\n</Window>"
+        }
+    ]
+}

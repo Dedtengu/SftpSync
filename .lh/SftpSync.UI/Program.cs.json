@@ -1,0 +1,22 @@
+{
+    "sourceFile": "SftpSync.UI/Program.cs",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1780584353631,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1780587175894,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,20 +1,32 @@\n using System;\r\n+using System.Windows;\r\n \r\n namespace SftpSync.UI\r\n {\r\n     public static class Program\r\n     {\r\n-        [STAThread] // Obligatoire pour que Windows autorise l'interface graphique (WPF)\r\n+        [STAThread]\r\n         public static void Main()\r\n         {\r\n-            // On crée le moteur d'application WPF\r\n-            var app = new System.Windows.Application();\r\n-            \r\n-            // On instancie notre fenêtre principale codée en C#\r\n-            var mainWindow = new MainWindow();\r\n-            \r\n-            // On demande à Windows d'afficher la fenêtre et de lancer l'application\r\n-            app.Run(mainWindow);\r\n+            try\r\n+            {\r\n+                var app = new System.Windows.Application();\r\n+                var mainWindow = new MainWindow();\r\n+                app.Run(mainWindow);\r\n+            }\r\n+            catch (Exception ex)\r\n+            {\r\n+                // Si l'application plante au démarrage, cette boîte va TOUT nous dire\r\n+                MessageBox.Show(\r\n+                    $\"L'application a planté au démarrage.\\n\\n\" +\r\n+                    $\"Message : {ex.Message}\\n\\n\" +\r\n+                    $\"Détails : {ex.InnerException?.Message}\\n\\n\" +\r\n+                    $\"Détails techniques :\\n{ex.StackTrace}\", \r\n+                    \"Crash Majeur Détecté\", \r\n+                    MessageBoxButton.OK, \r\n+                    MessageBoxImage.Error\r\n+                );\r\n+            }\r\n         }\r\n     }\r\n }\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1780584353631,
+            "name": "Commit-0",
+            "content": "using System;\r\n\r\nnamespace SftpSync.UI\r\n{\r\n    public static class Program\r\n    {\r\n        [STAThread] // Obligatoire pour que Windows autorise l'interface graphique (WPF)\r\n        public static void Main()\r\n        {\r\n            // On crée le moteur d'application WPF\r\n            var app = new System.Windows.Application();\r\n            \r\n            // On instancie notre fenêtre principale codée en C#\r\n            var mainWindow = new MainWindow();\r\n            \r\n            // On demande à Windows d'afficher la fenêtre et de lancer l'application\r\n            app.Run(mainWindow);\r\n        }\r\n    }\r\n}"
+        }
+    ]
+}

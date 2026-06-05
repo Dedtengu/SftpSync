@@ -1,0 +1,15 @@
+D:\SftpSync\SftpSync.Services\bin\Debug\net10.0\SftpSync.Services.deps.json
+D:\SftpSync\SftpSync.Services\bin\Debug\net10.0\SftpSync.Services.dll
+D:\SftpSync\SftpSync.Services\bin\Debug\net10.0\SftpSync.Services.pdb
+D:\SftpSync\SftpSync.Services\bin\Debug\net10.0\SftpSync.Core.dll
+D:\SftpSync\SftpSync.Services\bin\Debug\net10.0\SftpSync.Core.pdb
+D:\SftpSync\SftpSync.Services\obj\Debug\net10.0\SftpSync.Services.csproj.AssemblyReference.cache
+D:\SftpSync\SftpSync.Services\obj\Debug\net10.0\SftpSync.Services.GeneratedMSBuildEditorConfig.editorconfig
+D:\SftpSync\SftpSync.Services\obj\Debug\net10.0\SftpSync.Services.AssemblyInfoInputs.cache
+D:\SftpSync\SftpSync.Services\obj\Debug\net10.0\SftpSync.Services.AssemblyInfo.cs
+D:\SftpSync\SftpSync.Services\obj\Debug\net10.0\SftpSync.Services.csproj.CoreCompileInputs.cache
+D:\SftpSync\SftpSync.Services\obj\Debug\net10.0\SftpSync.976CEAA0.Up2Date
+D:\SftpSync\SftpSync.Services\obj\Debug\net10.0\SftpSync.Services.dll
+D:\SftpSync\SftpSync.Services\obj\Debug\net10.0\refint\SftpSync.Services.dll
+D:\SftpSync\SftpSync.Services\obj\Debug\net10.0\SftpSync.Services.pdb
+D:\SftpSync\SftpSync.Services\obj\Debug\net10.0\ref\SftpSync.Services.dll

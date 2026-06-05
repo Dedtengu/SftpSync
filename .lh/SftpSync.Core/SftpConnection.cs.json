@@ -1,0 +1,18 @@
+{
+    "sourceFile": "SftpSync.Core/SftpConnection.cs",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1780580154638,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1780580154637,
+            "name": "Commit-0",
+            "content": "using System;\r\n\r\nnamespace SftpSync.Core\r\n{\r\n    public class SftpConnection\r\n    {\r\n        public Guid Id { get; set; } = Guid.NewGuid();\r\n        public string Name { get; set; } = string.Empty;\r\n        public string Host { get; set; } = string.Empty;\r\n        public int Port { get; set; } = 22;\r\n        public string Username { get; set; } = string.Empty;\r\n        public string EncryptedPassword { get; set; } = string.Empty;\r\n        public string RemoteRootPath { get; set; } = \"/\";\r\n        public string ServerFingerprint { get; set; } = string.Empty;\r\n    }\r\n}"
+        }
+    ]
+}
