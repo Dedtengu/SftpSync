@@ -2,9 +2,11 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.IO;
+using System.Collections.Generic; // AJOUTÉ : Nécessaire pour Dictionary
+using System.Linq; // AJOUTÉ : Nécessaire pour l'utilisation de .Where() et .ToList()
 using SftpSync.Core;
 using SftpSync.Services;
-using System.IO;
 
 namespace SftpSync.UI
 {
@@ -14,6 +16,10 @@ namespace SftpSync.UI
         private readonly SftpService _sftpService;
         private readonly SyncEngine _syncEngine;
         private readonly EncryptionService _encryptionService;
+        
+        // Associe l'ID ou le nom d'une règle à son instance de surveillance active
+        private readonly Dictionary<string, FileSystemWatcher> _activeWatchers = new Dictionary<string, FileSystemWatcher>();
+        private Button? _btnStop; // Déclaration du bouton Stop
         
         private TextBox? _txtStatus;
         private Button? _btnTest;
@@ -25,7 +31,7 @@ namespace SftpSync.UI
             Title = "SftpSync - Assistant de Transfert";
             Icon = System.Windows.Media.Imaging.BitmapFrame.Create(new Uri("pack://application:,,,/app_icon.ico"));
             Height = 380; // Légèrement agrandie pour faire de la place au sélecteur
-            Width = 720;
+            Width = 850;
             Background = new SolidColorBrush(Color.FromRgb(245, 245, 245));
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
@@ -33,6 +39,20 @@ namespace SftpSync.UI
             _sftpService = new SftpService();
             _syncEngine = new SyncEngine();
             _encryptionService = new EncryptionService();
+
+            // --- GESTION DU DÉMARRAGE AUTOMATIQUE MULTI-RÈGLES ---
+            Loaded += (s, e) =>
+            {
+                try
+                {
+                    // On passe un sender "null" pour indiquer au code que c'est le démarrage automatique
+                    BtnStart_Click(null!, new RoutedEventArgs());
+                }
+                catch (Exception ex)
+                {
+                    _txtStatus?.AppendText($"[ERREUR AUTO-START] {ex.Message}\r\n");
+                }
+            };
 
             BuildUserInterface();
             PreconfigureDemoIfNeeded();
@@ -95,6 +115,19 @@ namespace SftpSync.UI
             };
             _btnStart.Click += BtnStart_Click;
 
+            _btnStop = new Button 
+            { 
+                Content = "⏸ Arrêter la Surveillance", 
+                Width = 160,
+                Height = 35, 
+                Margin = new Thickness(10, 0, 0, 0), // Aligné horizontalement
+                Background = new SolidColorBrush(Color.FromRgb(220, 53, 69)), 
+                Foreground = Brushes.White, 
+                FontWeight = FontWeights.Bold, 
+                IsEnabled = false 
+            };
+            _btnStop.Click += BtnStop_Click;
+
             Button btnConfig = new Button
             {
                 Content = "⚙️ Config Serveurs",
@@ -119,8 +152,10 @@ namespace SftpSync.UI
             };
             btnRules.Click += BtnRules_Click;
 
+            // Ajout ordonné de tous les boutons dans le même bandeau horizontal
             buttonPanel.Children.Add(_btnTest);
             buttonPanel.Children.Add(_btnStart);
+            buttonPanel.Children.Add(_btnStop); // CORRIGÉ : Ajouté au bon panel et au bon endroit
             buttonPanel.Children.Add(btnConfig); 
             buttonPanel.Children.Add(btnRules);
             
@@ -206,7 +241,6 @@ namespace SftpSync.UI
                 return;
             }
 
-            // On récupère le serveur sélectionné dans la liste déroulante !
             var selectedConn = _configService.GetConnections()[_cmbServers.SelectedIndex];
             _txtStatus?.AppendText($"[SFTP] Tentative de connexion à [{selectedConn.Name}] -> {selectedConn.Host}:{selectedConn.Port}...\r\n");
 
@@ -222,65 +256,63 @@ namespace SftpSync.UI
             }
         }
 
-       private void BtnStart_Click(object sender, RoutedEventArgs e)
+        private void BtnStart_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // 1. On récupère la liste des règles sauvegardées en JSON
                 var activeRules = _configService.GetRules();
+
+                // Si le clic vient du démarrage automatique (sender est null), 
+                // on filtre uniquement les règles cochées "IsAutoStart"
+                if (sender == null)
+                {
+                    activeRules = activeRules.Where(r => r.IsEnabled && r.IsAutoStart).ToList();
+                    if (activeRules.Count == 0) return; // Rien à lancer en auto, on sort discrètement
+                }
+                else
+                {
+                    // Sinon (clic manuel), on prend toutes les règles activées
+                    activeRules = activeRules.Where(r => r.IsEnabled).ToList();
+                }
 
                 if (activeRules.Count == 0)
                 {
-                    _txtStatus?.AppendText("[ATTENTION] Aucune règle de synchronisation n'est configurée. Créez-en une via 'Config Règles'.\r\n");
+                    _txtStatus?.AppendText("[ATTENTION] Aucune règle active à surveiller.\r\n");
                     return;
                 }
 
-                // 2. On arrête le moteur s'il tournait déjà pour le réinitialiser proprement
-                _syncEngine.Stop();
-
-                // 3. On injecte les règles et les connexions dans le moteur de suivi
+                // On injecte les règles filtrées dans notre moteur de services
                 _syncEngine.Initialize(activeRules, _configService.GetConnections());
-
-                // On s'abonne aux logs du moteur
-                _syncEngine.OnLog += (message) => 
-                {
-                    string logLine = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}";
-
-                    // 1. Affichage à l'écran (IHM)
-                    Dispatcher.Invoke(() => _txtStatus?.AppendText($"{logLine}\r\n"));
-
-                    // 2. Écriture dans un fichier texte journalier
-                    try
-                    {
-                        string logFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
-                        if (!Directory.Exists(logFolder)) Directory.CreateDirectory(logFolder);
-
-                        string logFile = Path.Combine(logFolder, $"log_{DateTime.Now:yyyy-MM-dd}.txt");
-                        File.AppendAllText(logFile, logLine + Environment.NewLine);
-                    }
-                    catch
-                    {
-                        // On ignore silencieusement les erreurs d'écriture de log pour ne pas bloquer le moteur
-                    }
-                };
-
-                // 4. On lance la surveillance des dossiers locaux
                 _syncEngine.Start();
 
-                _txtStatus?.AppendText("[MOTEUR] Surveillance active ! Dossiers surveillés :\r\n");
+                _txtStatus?.AppendText("[MOTEUR] Surveillance démarrée pour les règles suivantes :\r\n");
                 foreach (var rule in activeRules)
                 {
-                    if (rule.IsEnabled)
-                    {
-                        _txtStatus?.AppendText($" -> Règle '{rule.Name}' : {rule.LocalFolder} ({rule.FileFilter}) -> Distant: {rule.RemoteFolder}\r\n");
-                    }
+                    _txtStatus?.AppendText($" -> [{rule.Name}] : {rule.LocalFolder} -> {rule.RemoteFolder}\r\n");
                 }
 
                 if (_btnStart != null) _btnStart.IsEnabled = false;
+                if (_btnStop != null) _btnStop.IsEnabled = true;
             }
             catch (Exception ex)
             {
-                _txtStatus?.AppendText($"[ERREUR] Impossible de lancer le moteur : {ex.Message}\r\n");
+                _txtStatus?.AppendText($"[ERREUR MOTEUR] Impossible de démarrer : {ex.Message}\r\n");
+            }
+        }
+
+        private void BtnStop_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _syncEngine.Stop();
+                _txtStatus?.AppendText("[MOTEUR] Surveillance mise en pause. Tous les dossiers locaux sont libérés.\r\n");
+                
+                if (_btnStart != null) _btnStart.IsEnabled = true;
+                if (_btnStop != null) _btnStop.IsEnabled = false;
+            }
+            catch (Exception ex)
+            {
+                _txtStatus?.AppendText($"[ERREUR MOTEUR] Impossible d'arrêter proprement : {ex.Message}\r\n");
             }
         }
 
@@ -290,7 +322,6 @@ namespace SftpSync.UI
             configWin.Owner = this;
             configWin.ShowDialog();
             
-            // Une fois la fenêtre de config fermée, on rafraîchit la liste pour voir les nouveautés !
             RefreshServerList();
         }
 
@@ -300,7 +331,6 @@ namespace SftpSync.UI
             ruleWin.Owner = this;
             ruleWin.ShowDialog();
             
-            // Recharger si nécessaire
             RefreshServerList();
         }
     }

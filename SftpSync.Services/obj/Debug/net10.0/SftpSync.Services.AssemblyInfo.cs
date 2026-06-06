@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SftpSync.Services")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d137029256304d661f21e9fe1a0eb560ff0b89d9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6cfd86ec1fff868f58dd9ea2721aeb4c5910f4dd")]
 [assembly: System.Reflection.AssemblyProductAttribute("SftpSync.Services")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SftpSync.Services")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

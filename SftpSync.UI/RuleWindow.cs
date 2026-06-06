@@ -19,6 +19,7 @@ namespace SftpSync.UI
         private TextBox? _txtFileFilter;
         private CheckBox? _chkArchive;
         private TextBox? _txtArchiveFolder;
+        private CheckBox? _chkAutoStart;
 
         public RuleWindow()
         {
@@ -98,12 +99,15 @@ namespace SftpSync.UI
             _txtFileFilter = new TextBox { Height = 25, Text = "*.*" };
             formPanel.Children.Add(_txtFileFilter);
 
-            _chkArchive = new CheckBox { Content = "Archiver localement après envoi", Margin = new Thickness(0, 15, 0, 5), FontWeight = FontWeights.Bold };
+            _chkArchive = new CheckBox { Content = "Archiver localement après envoi", Margin = new Thickness(0, 15, 0, 5) };
             formPanel.Children.Add(_chkArchive);
 
             formPanel.Children.Add(new TextBlock { Text = "Dossier d'archive (ex: C:\\SftpArchive) :", Margin = new Thickness(0, 5, 0, 2) });
             _txtArchiveFolder = new TextBox { Height = 25 };
             formPanel.Children.Add(_txtArchiveFolder);
+
+            _chkAutoStart = new CheckBox { Content = "🚀 Lancer la surveillance automatiquement au démarrage", Margin = new Thickness(0, 5, 0, 5) };
+            formPanel.Children.Add(_chkAutoStart);
 
             Button btnSave = new Button { Content = "💾 Enregistrer la Règle", Height = 35, Margin = new Thickness(0, 20, 0, 0), Background = new SolidColorBrush(Color.FromRgb(0, 122, 204)), Foreground = Brushes.White, FontWeight = FontWeights.Bold };
             btnSave.Click += BtnSave_Click;
@@ -153,6 +157,8 @@ namespace SftpSync.UI
                 int idx = connections.FindIndex(c => c.Id == rule.ConnectionId);
                 _cmbServers.SelectedIndex = idx != -1 ? idx : 0;
             }
+
+            if (_chkAutoStart != null) _chkAutoStart.IsChecked = rule.IsAutoStart;
         }
 
         private void BtnNew_Click(object sender, RoutedEventArgs e)
@@ -211,6 +217,10 @@ namespace SftpSync.UI
                 };
                 rules.Add(newRule);
             }
+            
+           // --- LOGIQUE AUTO-START MULTI-RÈGLES ---
+            var targetRule = (_lstRules != null && _lstRules.SelectedIndex != -1) ? rules[_lstRules.SelectedIndex] : rules.Last();
+            targetRule.IsAutoStart = _chkAutoStart?.IsChecked ?? false;
 
             _configService.Save();
             RefreshRuleList();

@@ -13,5 +13,6 @@ namespace SftpSync.Core
         public bool IsEnabled { get; set; } = true;
         public bool ArchiveAfterSend { get; set; } = true;
         public string ArchiveFolder { get; set; } = string.Empty;
+        public bool IsAutoStart { get; set; }
     }
 }

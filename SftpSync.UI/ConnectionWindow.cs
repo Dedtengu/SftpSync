@@ -23,7 +23,7 @@ namespace SftpSync.UI
         {
             Title = "Gestion des Connexions SFTP";
             Height = 450;
-            Width = 600;
+            Width = 550;
             Background = new SolidColorBrush(Color.FromRgb(245, 245, 245));
             WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
