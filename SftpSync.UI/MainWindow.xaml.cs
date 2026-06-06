@@ -23,6 +23,7 @@ namespace SftpSync.UI
         public MainWindow()
         {
             Title = "SftpSync - Assistant de Transfert";
+            Icon = System.Windows.Media.Imaging.BitmapFrame.Create(new Uri("pack://application:,,,/app_icon.ico"));
             Height = 380; // Légèrement agrandie pour faire de la place au sélecteur
             Width = 720;
             Background = new SolidColorBrush(Color.FromRgb(245, 245, 245));

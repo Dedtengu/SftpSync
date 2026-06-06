@@ -1,0 +1,22 @@
+{
+    "sourceFile": "product.wxs",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1780677599304,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1780678495565,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -9,8 +9,11 @@\n     <MajorUpgrade DowngradeErrorMessage=\"Une version plus récente de [ProductName] est déjà installée.\" />\r\n \r\n     <MediaTemplate EmbedCab=\"yes\" />\r\n \r\n+    <Icon Id=\"AppIcon.ico\" SourceFile=\"D:\\SftpSync\\SftpSync.UI\\app_icon.ico\" />\r\n+    <Property Id=\"ARPPRODUCTICON\" Value=\"AppIcon.ico\" />\r\n+\r\n     <StandardDirectory Id=\"ProgramFiles64Folder\">\r\n       <Directory Id=\"INSTALLFOLDER\" Name=\"SftpSync\" />\r\n     </StandardDirectory>\r\n \r\n@@ -30,14 +33,16 @@\n         <Shortcut Id=\"StartMenuShortcut\" \r\n                   Directory=\"ApplicationProgramsFolder\" \r\n                   Name=\"SftpSync\" \r\n                   WorkingDirectory=\"INSTALLFOLDER\" \r\n+                  Icon=\"AppIcon.ico\"\r\n                   Advertise=\"yes\" />\r\n \r\n         <Shortcut Id=\"DesktopShortcut\" \r\n                   Directory=\"DesktopFolder\" \r\n                   Name=\"SftpSync\" \r\n                   WorkingDirectory=\"INSTALLFOLDER\" \r\n+                  Icon=\"AppIcon.ico\"\r\n                   Advertise=\"yes\" />\r\n       </Component>\r\n \r\n       <Files Include=\"D:\\SftpSync\\SftpSync.UI\\bin\\Release\\net10.0-windows10.0.19041.0\\win-x64\\publish\\***\" />\r\n"
+                }
+            ],
+            "date": 1780677599304,
+            "name": "Commit-0",
+            "content": "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">\r\n  <Package Name=\"SftpSync\" \r\n           Manufacturer=\"André Maillard\" \r\n           Version=\"1.0.0\" \r\n           UpgradeCode=\"6ba7b810-93ee-4e50-8673-e380f2b0f49a\" \r\n           Language=\"1036\" \r\n           Scope=\"perMachine\">\r\n    \r\n    <MajorUpgrade DowngradeErrorMessage=\"Une version plus récente de [ProductName] est déjà installée.\" />\r\n\r\n    <MediaTemplate EmbedCab=\"yes\" />\r\n\r\n    <StandardDirectory Id=\"ProgramFiles64Folder\">\r\n      <Directory Id=\"INSTALLFOLDER\" Name=\"SftpSync\" />\r\n    </StandardDirectory>\r\n\r\n    <StandardDirectory Id=\"DesktopFolder\" />\r\n\r\n    <StandardDirectory Id=\"ProgramMenuFolder\">\r\n      <Directory Id=\"ApplicationProgramsFolder\" Name=\"SftpSync\" />\r\n    </StandardDirectory>\r\n\r\n    <ComponentGroup Id=\"ProductComponents\" Directory=\"INSTALLFOLDER\">\r\n      \r\n      <Component Id=\"MainExecutable\" Guid=\"a1b2c3d4-e5f6-47a8-99b0-11c2d3e4f5a6\">\r\n        <File Id=\"SftpSyncEXE\" \r\n              Source=\"D:\\SftpSync\\SftpSync.UI\\bin\\Release\\net10.0-windows10.0.19041.0\\win-x64\\publish\\SftpSync.UI.exe\" \r\n              KeyPath=\"yes\" />\r\n        \r\n        <Shortcut Id=\"StartMenuShortcut\" \r\n                  Directory=\"ApplicationProgramsFolder\" \r\n                  Name=\"SftpSync\" \r\n                  WorkingDirectory=\"INSTALLFOLDER\" \r\n                  Advertise=\"yes\" />\r\n\r\n        <Shortcut Id=\"DesktopShortcut\" \r\n                  Directory=\"DesktopFolder\" \r\n                  Name=\"SftpSync\" \r\n                  WorkingDirectory=\"INSTALLFOLDER\" \r\n                  Advertise=\"yes\" />\r\n      </Component>\r\n\r\n      <Files Include=\"D:\\SftpSync\\SftpSync.UI\\bin\\Release\\net10.0-windows10.0.19041.0\\win-x64\\publish\\***\" />\r\n\r\n    </ComponentGroup>\r\n\r\n    <DirectoryRef Id=\"ApplicationProgramsFolder\">\r\n      <Component Id=\"CleanupShortcuts\" Guid=\"7fe5c921-1402-4b24-9b11-d9bb730a4422\">\r\n        <RemoveFolder Id=\"CleanupShortcuts\" On=\"uninstall\" />\r\n        <RegistryValue Root=\"HKCU\" Key=\"Software\\AndreMaillard\\SftpSync\" Name=\"installed\" Type=\"integer\" Value=\"1\" KeyPath=\"yes\" />\r\n      </Component>\r\n    </DirectoryRef>\r\n\r\n    <Feature Id=\"MainFeature\" Title=\"SftpSync Installation\" Level=\"1\">\r\n      <ComponentGroupRef Id=\"ProductComponents\" />\r\n      <ComponentRef Id=\"CleanupShortcuts\" />\r\n    </Feature>\r\n  </Package>\r\n</Wix>"
+        }
+    ]
+}

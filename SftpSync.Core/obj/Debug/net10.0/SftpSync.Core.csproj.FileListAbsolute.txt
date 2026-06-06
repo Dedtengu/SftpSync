@@ -5,6 +5,7 @@ D:\SftpSync\SftpSync.Core\obj\Debug\net10.0\SftpSync.Core.GeneratedMSBuildEditor
 D:\SftpSync\SftpSync.Core\obj\Debug\net10.0\SftpSync.Core.AssemblyInfoInputs.cache
 D:\SftpSync\SftpSync.Core\obj\Debug\net10.0\SftpSync.Core.AssemblyInfo.cs
 D:\SftpSync\SftpSync.Core\obj\Debug\net10.0\SftpSync.Core.csproj.CoreCompileInputs.cache
+D:\SftpSync\SftpSync.Core\obj\Debug\net10.0\SftpSync.Core.sourcelink.json
 D:\SftpSync\SftpSync.Core\obj\Debug\net10.0\SftpSync.Core.dll
 D:\SftpSync\SftpSync.Core\obj\Debug\net10.0\refint\SftpSync.Core.dll
 D:\SftpSync\SftpSync.Core\obj\Debug\net10.0\SftpSync.Core.pdb
