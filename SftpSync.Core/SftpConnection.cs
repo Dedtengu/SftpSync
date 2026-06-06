@@ -12,5 +12,6 @@ namespace SftpSync.Core
         public string EncryptedPassword { get; set; } = string.Empty;
         public string RemoteRootPath { get; set; } = "/";
         public string ServerFingerprint { get; set; } = string.Empty;
+        public string LogFolderPath { get; set; } = string.Empty;
     }
 }

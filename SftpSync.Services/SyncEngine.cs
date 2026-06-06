@@ -17,6 +17,7 @@ namespace SftpSync.Services
         private List<SyncRule> _rules = new List<SyncRule>();
         private List<SftpConnection> _connections = new List<SftpConnection>();
         private readonly List<FileSystemWatcher> _watchers = new List<FileSystemWatcher>();
+        public event Action<string>? OnLogMessage;
 
         public SyncEngine()
         {
@@ -115,6 +116,7 @@ namespace SftpSync.Services
                     if (transferSuccess)
                     {
                         OnLog?.Invoke($"[SUCCÈS] Transfert réussi pour {fileName}");
+                        OnLogMessage?.Invoke($"[TRANSFERT] Fichier '{fileName}' envoyé avec succès vers le serveur.");
                         
                         // 4. Gestion Post-Transfert avec évitement des doublons d'archive
                         HandlePostTransferSuccessWithUniqueName(localFilePath, rule);
@@ -160,6 +162,7 @@ namespace SftpSync.Services
 
                     File.Move(filePath, destinationPath);
                     OnLog?.Invoke($"[ARCHIVE] Fichier archivé sous : {Path.GetFileName(destinationPath)}");
+                    OnLogMessage?.Invoke($"[ARCHIVE] Fichier '{Path.GetFileName(destinationPath)}' déplacé dans le dossier d'archive.");
                 }
                 else
                 {

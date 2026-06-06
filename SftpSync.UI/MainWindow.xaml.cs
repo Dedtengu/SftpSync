@@ -3,8 +3,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.IO;
-using System.Collections.Generic; // AJOUTÉ : Nécessaire pour Dictionary
-using System.Linq; // AJOUTÉ : Nécessaire pour l'utilisation de .Where() et .ToList()
+using System.Collections.Generic;
+using System.Linq;
 using SftpSync.Core;
 using SftpSync.Services;
 
@@ -12,26 +12,24 @@ namespace SftpSync.UI
 {
     public class MainWindow : Window
     {
-        private readonly ConfigService _configService;
+        private ConfigService _configService;
         private readonly SftpService _sftpService;
         private readonly SyncEngine _syncEngine;
         private readonly EncryptionService _encryptionService;
         
-        // Associe l'ID ou le nom d'une règle à son instance de surveillance active
-        private readonly Dictionary<string, FileSystemWatcher> _activeWatchers = new Dictionary<string, FileSystemWatcher>();
-        private Button? _btnStop; // Déclaration du bouton Stop
-        
         private TextBox? _txtStatus;
         private Button? _btnTest;
         private Button? _btnStart;
-        private ComboBox? _cmbServers; // Notre nouvelle liste déroulante
+        private Button? _btnStop;
+        private ComboBox? _cmbServers;
+        private TextBox? _txtLogPath; // NOUVEAU : Champ pour le chemin du log
 
         public MainWindow()
         {
             Title = "SftpSync - Assistant de Transfert";
             Icon = System.Windows.Media.Imaging.BitmapFrame.Create(new Uri("pack://application:,,,/app_icon.ico"));
-            Height = 380; // Légèrement agrandie pour faire de la place au sélecteur
-            Width = 850;
+            Height = 420; // Légèrement agrandi pour le champ de log
+            Width = 820;
             Background = new SolidColorBrush(Color.FromRgb(245, 245, 245));
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
 
@@ -45,18 +43,21 @@ namespace SftpSync.UI
             {
                 try
                 {
-                    // On passe un sender "null" pour indiquer au code que c'est le démarrage automatique
+                    // Au démarrage initial, on charge le chemin de log sauvegardé s'il existe
+                    // (Adapte cette ligne selon comment ton ConfigService stocke les strings globales)
+                    // _txtLogPath.Text = _configService.GetLogFolder(); 
+
                     BtnStart_Click(null!, new RoutedEventArgs());
                 }
                 catch (Exception ex)
                 {
-                    _txtStatus?.AppendText($"[ERREUR AUTO-START] {ex.Message}\r\n");
+                    LogAction($"[ERREUR AUTO-START] {ex.Message}");
                 }
             };
 
             BuildUserInterface();
             PreconfigureDemoIfNeeded();
-            RefreshServerList(); // Charger les serveurs au démarrage
+            RefreshServerList();
         }
 
         private void BuildUserInterface()
@@ -64,6 +65,7 @@ namespace SftpSync.UI
             Grid mainGrid = new Grid { Margin = new Thickness(20) };
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // Titre
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // Sélecteur de serveur
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // NOUVEAU : Option Log
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // Boutons
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // Logs
 
@@ -79,15 +81,23 @@ namespace SftpSync.UI
             Grid.SetRow(title, 0);
             mainGrid.Children.Add(title);
 
-            // 1B. NOUVEAU : Zone de sélection du serveur active
-            StackPanel serverSelectionPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 15) };
+            // 1B. Zone de sélection du serveur active
+            StackPanel serverSelectionPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 10) };
             serverSelectionPanel.Children.Add(new TextBlock { Text = "Serveur actif : ", VerticalAlignment = VerticalAlignment.Center, FontWeight = FontWeights.Bold });
-            
             _cmbServers = new ComboBox { Width = 250, Height = 25, VerticalAlignment = VerticalAlignment.Center };
             serverSelectionPanel.Children.Add(_cmbServers);
-            
             Grid.SetRow(serverSelectionPanel, 1);
             mainGrid.Children.Add(serverSelectionPanel);
+
+            // 1C. NOUVEAU : Zone de configuration du chemin de Log
+            StackPanel logConfigPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 15) };
+            logConfigPanel.Children.Add(new TextBlock { Text = "Dossier des Logs : ", VerticalAlignment = VerticalAlignment.Center, FontWeight = FontWeights.Bold });
+            _txtLogPath = new TextBox { Width = 400, Height = 25, VerticalAlignment = VerticalAlignment.Center, ToolTip = "Laisser vide pour désactiver l'écriture des fichiers logs texte." };
+            // Optionnel : attribuer une valeur par défaut au premier lancement
+            _txtLogPath.Text = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs"); 
+            logConfigPanel.Children.Add(_txtLogPath);
+            Grid.SetRow(logConfigPanel, 2);
+            mainGrid.Children.Add(logConfigPanel);
 
             // 2. Boutons d'action
             StackPanel buttonPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 15) };
@@ -120,7 +130,7 @@ namespace SftpSync.UI
                 Content = "⏸ Arrêter la Surveillance", 
                 Width = 160,
                 Height = 35, 
-                Margin = new Thickness(10, 0, 0, 0), // Aligné horizontalement
+                Margin = new Thickness(10, 0, 0, 0),
                 Background = new SolidColorBrush(Color.FromRgb(220, 53, 69)), 
                 Foreground = Brushes.White, 
                 FontWeight = FontWeights.Bold, 
@@ -152,17 +162,16 @@ namespace SftpSync.UI
             };
             btnRules.Click += BtnRules_Click;
 
-            // Ajout ordonné de tous les boutons dans le même bandeau horizontal
             buttonPanel.Children.Add(_btnTest);
             buttonPanel.Children.Add(_btnStart);
-            buttonPanel.Children.Add(_btnStop); // CORRIGÉ : Ajouté au bon panel et au bon endroit
+            buttonPanel.Children.Add(_btnStop);
             buttonPanel.Children.Add(btnConfig); 
             buttonPanel.Children.Add(btnRules);
             
-            Grid.SetRow(buttonPanel, 2);
+            Grid.SetRow(buttonPanel, 3);
             mainGrid.Children.Add(buttonPanel);
 
-            // 3. Zone de Logs
+            // 3. Zone de Logs IHM
             GroupBox groupBox = new GroupBox { Header = "Journal d'activité en direct", Padding = new Thickness(10) };
             _txtStatus = new TextBox
             {
@@ -173,13 +182,12 @@ namespace SftpSync.UI
                 FontFamily = new FontFamily("Consolas")
             };
             groupBox.Content = _txtStatus;
-            Grid.SetRow(groupBox, 3);
+            Grid.SetRow(groupBox, 4);
             mainGrid.Children.Add(groupBox);
 
             Content = mainGrid;
         }
 
-        // Remplit la liste déroulante avec les serveurs enregistrés
         private void RefreshServerList()
         {
             if (_cmbServers == null) return;
@@ -192,11 +200,7 @@ namespace SftpSync.UI
                 _cmbServers.Items.Add(conn.Name);
             }
 
-            // Sélectionner le premier serveur par défaut s'il y en a
-            if (_cmbServers.Items.Count > 0)
-            {
-                _cmbServers.SelectedIndex = 0;
-            }
+            if (_cmbServers.Items.Count > 0) _cmbServers.SelectedIndex = 0;
         }
 
         private void PreconfigureDemoIfNeeded()
@@ -242,17 +246,17 @@ namespace SftpSync.UI
             }
 
             var selectedConn = _configService.GetConnections()[_cmbServers.SelectedIndex];
-            _txtStatus?.AppendText($"[SFTP] Tentative de connexion à [{selectedConn.Name}] -> {selectedConn.Host}:{selectedConn.Port}...\r\n");
+            LogAction($"[SFTP] Tentative de connexion à [{selectedConn.Name}] -> {selectedConn.Host}:{selectedConn.Port}...");
 
             var result = await _sftpService.TestConnectionAsync(selectedConn);
 
             if (result.success)
             {
-                _txtStatus?.AppendText($"[SUCCÈS] Connexion réussie ! Empreinte : {result.fingerprint}\r\n");
+                LogAction($"[SUCCÈS] Connexion réussie ! Empreinte : {result.fingerprint}");
             }
             else
             {
-                _txtStatus?.AppendText($"[ÉCHEC] Connexion échouée : {result.errorMessage}\r\n");
+                LogAction($"[ÉCHEC] Connexion échouée : {result.errorMessage}");
             }
         }
 
@@ -260,43 +264,49 @@ namespace SftpSync.UI
         {
             try
             {
+               // On recrée l'instance pour forcer la relecture fraîche du fichier JSON
+                _configService = new ConfigService();
+                
                 var activeRules = _configService.GetRules();
 
-                // Si le clic vient du démarrage automatique (sender est null), 
-                // on filtre uniquement les règles cochées "IsAutoStart"
-                if (sender == null)
+                if (sender == null) // Auto-start au chargement
                 {
                     activeRules = activeRules.Where(r => r.IsEnabled && r.IsAutoStart).ToList();
-                    if (activeRules.Count == 0) return; // Rien à lancer en auto, on sort discrètement
+                    if (activeRules.Count == 0) return;
                 }
                 else
                 {
-                    // Sinon (clic manuel), on prend toutes les règles activées
                     activeRules = activeRules.Where(r => r.IsEnabled).ToList();
                 }
 
                 if (activeRules.Count == 0)
                 {
-                    _txtStatus?.AppendText("[ATTENTION] Aucune règle active à surveiller.\r\n");
+                    LogAction("[ATTENTION] Aucune règle active à surveiller.");
                     return;
                 }
 
-                // On injecte les règles filtrées dans notre moteur de services
                 _syncEngine.Initialize(activeRules, _configService.GetConnections());
+                // On écoute les notifications du moteur pour les envoyer dans nos logs
+                _syncEngine.OnLogMessage += (msg) => {
+                    // WPF impose de repasser par le Dispatcher pour mettre à jour l'IHM 
+                    // depuis un thread d'arrière-plan (le FileSystemWatcher)
+                    Dispatcher.Invoke(() => LogAction(msg));
+                };
                 _syncEngine.Start();
 
-                _txtStatus?.AppendText("[MOTEUR] Surveillance démarrée pour les règles suivantes :\r\n");
+                LogAction("[MOTEUR] Surveillance démarrée pour les règles suivantes :");
                 foreach (var rule in activeRules)
                 {
-                    _txtStatus?.AppendText($" -> [{rule.Name}] : {rule.LocalFolder} -> {rule.RemoteFolder}\r\n");
+                    LogAction($" -> [{rule.Name}] : {rule.LocalFolder} -> {rule.RemoteFolder}");
                 }
 
                 if (_btnStart != null) _btnStart.IsEnabled = false;
                 if (_btnStop != null) _btnStop.IsEnabled = true;
+                if (_txtLogPath != null) _txtLogPath.IsEnabled = false; // Bloquer le champ pendant la surveillance
             }
             catch (Exception ex)
             {
-                _txtStatus?.AppendText($"[ERREUR MOTEUR] Impossible de démarrer : {ex.Message}\r\n");
+                LogAction($"[ERREUR MOTEUR] Impossible de démarrer : {ex.Message}");
             }
         }
 
@@ -304,15 +314,17 @@ namespace SftpSync.UI
         {
             try
             {
+                _syncEngine.OnLogMessage -= (msg) => { }; // Nettoyage de l'écouteur
                 _syncEngine.Stop();
-                _txtStatus?.AppendText("[MOTEUR] Surveillance mise en pause. Tous les dossiers locaux sont libérés.\r\n");
+                LogAction("[MOTEUR] Surveillance mise en pause. Tous les dossiers locaux sont libérés.");
                 
                 if (_btnStart != null) _btnStart.IsEnabled = true;
                 if (_btnStop != null) _btnStop.IsEnabled = false;
+                if (_txtLogPath != null) _txtLogPath.IsEnabled = true; // Libérer le champ
             }
             catch (Exception ex)
             {
-                _txtStatus?.AppendText($"[ERREUR MOTEUR] Impossible d'arrêter proprement : {ex.Message}\r\n");
+                LogAction($"[ERREUR MOTEUR] Impossible d'arrêter proprement : {ex.Message}");
             }
         }
 
@@ -321,7 +333,6 @@ namespace SftpSync.UI
             ConnectionWindow configWin = new ConnectionWindow();
             configWin.Owner = this;
             configWin.ShowDialog();
-            
             RefreshServerList();
         }
 
@@ -331,7 +342,39 @@ namespace SftpSync.UI
             ruleWin.Owner = this;
             ruleWin.ShowDialog();
             
+            // CRUCIAL : Recharger le service de config local pour prendre en compte immédiatement les changements graphiques
+            _configService = new ConfigService(); 
             RefreshServerList();
+        }
+
+        // centralisation des logs IHM + Écriture conditionnelle dans le fichier physique
+        private void LogAction(string message)
+        {
+            string logLine = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}";
+            
+            // 1. Affichage dans la boîte de dialogue de l'IHM
+            _txtStatus?.AppendText(logLine + Environment.NewLine);
+            _txtStatus?.ScrollToEnd();
+
+            // 2. Écriture physique optionnelle si le chemin est renseigné
+            if (_txtLogPath != null && !string.IsNullOrWhiteSpace(_txtLogPath.Text))
+            {
+                try
+                {
+                    string logFolder = _txtLogPath.Text.Trim();
+                    if (!Directory.Exists(logFolder)) 
+                    {
+                        Directory.CreateDirectory(logFolder);
+                    }
+
+                    string logFile = Path.Combine(logFolder, $"log_{DateTime.Now:yyyy-MM-dd}.txt");
+                    File.AppendAllText(logFile, logLine + Environment.NewLine);
+                }
+                catch (Exception)
+                {
+                    // On évite de faire planter l'application globale si les droits d'écriture sur le dossier ciblé ont sauté
+                }
+            }
         }
     }
 }

@@ -1,0 +1,3 @@
+[2026-06-06 15:42:49] [MOTEUR] Surveillance démarrée pour les règles suivantes :
+[2026-06-06 15:42:49]  -> [Envoi APAJH CAMSP76] : C:\SftpSource -> /sftp_dir/importDocuments/camsp76/CAMSP_DIEPPE
+[2026-06-06 15:42:49]  -> [Envoi APAJH CAMSP37] : C:\SftpSource -> /sftp_dir/importDocuments/camsp37/Documents
